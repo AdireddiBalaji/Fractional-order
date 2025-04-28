@@ -11,7 +11,7 @@ set(groot,'defaulttextInterpreter','latex')
 set(groot,'defaultLegendInterpreter','latex')
 
 m=5;   % Number of shape functions for first Galerkin approximation
-N=12;  % Number of shape functions in second Galerkin approximation
+N=14;  % Number of shape functions in second Galerkin approximation
 Td=2*pi; % time delay in the system
 % parameters used 
 c=0.2;d=-0.01;omega=2*pi;
