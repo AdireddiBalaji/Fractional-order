@@ -1,22 +1,22 @@
 %--------------------------------------------------------------------------
-%-----------  D^2 x(t) + c D^(1/2)x(t)+(delta+epsilon*cos(omega t))x(t)+k1 x(t-tau)=0 using Ode15s floquet
+%-----------  D^2 x(t) + c D^(alpha)x(t)+(delta+epsilon*cos(omega t))x(t)+d*cos(omega*t) x(t-tau)=0 using Ode15s floquet
 %----------- code by balaji adireddi
 %----------- Indian Institute of Technology Hyderabad
 clc
 clear all %#ok
-global c delta epsi k1 CoeMat N omega A_mat B_mat C_mat Td m%#ok
+global c delta epsi d CoeMat N omega A_mat B_mat C_mat Td m%#ok
 
 set(groot,'defaultAxesTickLabelInterpreter','latex')
 set(groot,'defaulttextInterpreter','latex')
 set(groot,'defaultLegendInterpreter','latex')
 
-m=7;   % Number of shape functions for first Galerkin approximation
-N=14;  % Number of shape functions in second Galerkin approximation
+m=5;   % Number of shape functions for first Galerkin approximation
+N=12;  % Number of shape functions in second Galerkin approximation
 Td=2*pi; % time delay in the system
 % parameters used 
-c=0.1;k1=-0.04;omega=1;
-Delta=linspace(-0.2,1.5,200); 
-Epsi=linspace(0,1.6,200);
+c=0.2;d=-0.01;omega=2*pi;
+Delta=linspace(6,12,50); 
+Epsi=linspace(0,6,50);
 alpha=0.5; % farctional order
 load(sprintf('Coeff_mat_N%d.mat',N));% load coefficient matrix for 2nd Galerkin appriximation from Maple code
 [A_mat, B_mat, C_mat] =frac_sys_mat(alpha,m); % Matrix from 1st Galerkin approximation
@@ -46,7 +46,7 @@ for i=length(Delta):-1:1
         end
         L=max(abs(eig(M))); % find maximum absolute eigen values
         lambda{i,j}=L;
-        save('floquet_Frac_alpha0pt5_Delay_Damped','lambda_Re_Im','lambda','i','j','Epsi','c','Delta','k1','N','m'); % save data
+        save('floquet_Frac_alpha0pt5_Delay_Damped','lambda_Re_Im','lambda','i','j','Epsi','c','Delta','d','N','m'); % save data
         
         if lambda{i,j} <1+1e-6 % stability criterion
             figure(11)
@@ -57,10 +57,10 @@ end
 
 %% Ode function
 function dy  = OdeFun(t,y)
-global c delta epsi k1 CoeMat N omega m  A_mat B_mat C_mat Td %#ok
+global c delta epsi d CoeMat N omega m  A_mat B_mat C_mat Td %#ok
 dy = zeros(N+m+1,1);
 dy(1:N,1) = CoeMat*[y(1:N+1,1)];
-dy(N+1,1)=-c*(Td^2)*C_mat'*y(N+2:N+m+1,1)-Td^2*(delta+epsi*cos(omega*Td*t))*y(1,1)-k1*Td^2*(y(1,1)+y(2,1));
+dy(N+1,1)=-c*(Td^2)*C_mat'*y(N+2:N+m+1,1)-Td^2*(delta+epsi*cos(omega*Td*t))*y(1,1)-d*cos(omega*Td*t)*Td^2*(y(1,1)+y(2,1));
 dy(N+2:N+m+1,1)=-Td*(A_mat\B_mat)*y(N+2:N+m+1,1)+(A_mat\C_mat)*y(N+1,1);
 end
 
